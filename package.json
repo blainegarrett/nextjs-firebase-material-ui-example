@@ -1,0 +1,27 @@
+{
+  "name": "nextjs-firebase-material-ui-example",
+  "version": "1.0.0",
+  "description": "Proof of concept boilerplate for next.js and Firebase with Material-UI",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://blainegarrett@github.com/blainegarrett/nextjs-firebase-material-ui-example.git"
+  },
+  "keywords": [
+    "next",
+    "nextjs",
+    "firebase",
+    "auth",
+    "material",
+    "node"
+  ],
+  "author": "Blaine Garrett <blaine@blainegarrett.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/blainegarrett/nextjs-firebase-material-ui-example/issues"
+  },
+  "homepage": "https://github.com/blainegarrett/nextjs-firebase-material-ui-example#readme"
+}
