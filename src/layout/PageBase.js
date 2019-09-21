@@ -3,10 +3,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import InternaLink from './InternalLink';
+import AppBar from './AppBar';
 
 export default function PageBase({ children }) {
   return (
     <div style={{ border: '10px solid black' }}>
+      <AppBar />
       <div>
         <InternaLink href="/">index</InternaLink> |{' '}
         <InternaLink href="/secure1">secure</InternaLink> |{' '}
