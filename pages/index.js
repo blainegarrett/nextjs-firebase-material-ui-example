@@ -8,7 +8,7 @@ import PageBase from '../src/layout/PageBase';
 
 export default function Index() {
   return (
-    <PageBase>
+    <PageBase signInRequired={false}>
       <h1>Index Page</h1>
     </PageBase>
   );

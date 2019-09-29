@@ -8,7 +8,7 @@ import PageBase from '../src/layout/PageBase';
 
 export default function Secure() {
   return (
-    <PageBase>
+    <PageBase signInRequired={true}>
       <h1>Secure</h1>
     </PageBase>
   );

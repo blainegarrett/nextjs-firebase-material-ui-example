@@ -5,6 +5,7 @@ import { ThemeProvider, StylesProvider } from '@material-ui/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import GlobalStyles from '../src/theming/global';
 import theme from '../src/theming/theme';
+import AuthContextProvider from '../src/auth/AuthContextProvider';
 
 class MyApp extends App {
   componentDidMount() {
@@ -19,7 +20,7 @@ class MyApp extends App {
     const { Component, pageProps } = this.props;
 
     return (
-      <Container>
+      <>
         <Head>
           <title>Next.js and Firebase Auth Example</title>
         </Head>
@@ -29,10 +30,12 @@ class MyApp extends App {
             <CssBaseline />
             <GlobalStyles />
 
-            <Component {...pageProps} />
+            <AuthContextProvider>
+              <Component {...pageProps} />
+            </AuthContextProvider>
           </ThemeProvider>
         </StylesProvider>
-      </Container>
+      </>
     );
   }
 }
