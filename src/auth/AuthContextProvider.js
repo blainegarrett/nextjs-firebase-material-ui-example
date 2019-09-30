@@ -4,13 +4,20 @@ import PropTypes from 'prop-types';
 
 export const AuthContext = React.createContext();
 import firebase from '../firebaseClient';
+import { SnackbarProvider, useSnackbar } from 'notistack';
 
 const AuthProvider = ({ children }) => {
   const [authState, setAuthState] = useState({
     user: null,
     claims: [],
-    loading: false
+    loading: false,
+    error: false
   });
+
+  const { enqueueSnackbar } = useSnackbar();
+  function snackbarLog(msg, variant) {
+    enqueueSnackbar(`${new Date().getTime()}: ${msg}`, { variant });
+  }
 
   useEffect(
     () => {
@@ -18,12 +25,30 @@ const AuthProvider = ({ children }) => {
       let authStateUnsubscribe = firebase
         .auth()
         .onAuthStateChanged(function(user) {
-          console.log('authstate changed!');
-
           if (user) {
-            setAuthState({ ...authState, loading: false, user: user });
+            setAuthState({
+              ...authState,
+              loading: false,
+              user: user,
+              error: false
+            });
+
+            // variant could be success, error, warning, info, or default
+            snackbarLog(
+              `onAuthStateChanged triggered. user.uid: ${user.uid}`,
+              'default'
+            );
           } else {
-            setAuthState({ ...authState, loading: false, user: null });
+            setAuthState({
+              ...authState,
+              loading: false,
+              user: null,
+              error: false
+            });
+            snackbarLog(
+              'onAuthStateChanged triggered without user ',
+              'default'
+            );
           }
         });
 
@@ -35,7 +60,7 @@ const AuthProvider = ({ children }) => {
 
   // Functions
   function masterLogin() {
-    console.log('login');
+    snackbarLog('user clicked login', 'info');
     setAuthState({ ...authState, loading: true });
 
     var provider = new firebase.auth.GoogleAuthProvider();
@@ -45,10 +70,24 @@ const AuthProvider = ({ children }) => {
       .auth()
       .signInWithPopup(provider)
       .then(function(result) {
+        snackbarLog('user successfully logged in to firebase', 'success');
         // This gives you a Google Access Token. You can use it to access the Google API.
         var token = result.credential.accessToken;
-        console.log(token);
+        setAuthState({ ...authState, loading: false });
+
+        //console.log(token);
+      })
+      .catch(error => {
+        snackbarLog(`failure logging into firebase: ${error.code}`, 'error');
+        console.error('Sign In Error', error);
       });
+  }
+
+  async function forceRefreshToken() {
+    let user = firebase.auth().currentUser;
+    await user.getIdToken(true);
+    snackbarLog('Firebase Id Token force refreshed', 'info');
+    setAuthState({ ...authState, user: user, loading: false });
   }
 
   function masterLogout() {
@@ -57,9 +96,12 @@ const AuthProvider = ({ children }) => {
       .signOut()
       .then(
         function() {
+          snackbarLog('Successfully signed out of Firebase', 'success');
           setAuthState({ ...authState, user: null });
         },
         function(error) {
+          // I could not get into this case...
+          snackbarLog(`Failed to sign out of Firebase ${error.code}`, 'error');
           console.error('Sign Out Error', error);
         }
       );
@@ -69,10 +111,13 @@ const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user: authState.user,
-        cheese: true,
+        loading: authState.loading,
+        error: authState.error,
 
         masterLogin,
-        masterLogout
+        masterLogout,
+        forceRefreshToken,
+        snackbarLog
       }}
     >
       {children}
@@ -84,4 +129,11 @@ AuthProvider.propTypes = {
   children: PropTypes.node
 };
 
-export default AuthProvider;
+// Wrap in snackbar for event display
+export default function withSnackBar({ ...props }) {
+  return (
+    <SnackbarProvider maxSnack={3}>
+      <AuthProvider {...props} />
+    </SnackbarProvider>
+  );
+}

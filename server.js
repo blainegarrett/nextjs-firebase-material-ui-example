@@ -1,5 +1,7 @@
 const express = require('express');
 const next = require('next');
+const apiHandlers = require('./api');
+
 /*
 Note: process.env.NODE_ENV is automatically set by GAE  when deployed
   but will need to be manually set locally via `NODE_ENV=production npm run start`
@@ -18,6 +20,7 @@ app
     const server = express();
     // Note: We're using Next.Js 9's file based dynamic routing so no need to match dynamic urls as in  version
 
+    server.use('/api', apiHandlers);
     server.get('*', (req, res) => handle(req, res));
 
     server.listen(port, err => {

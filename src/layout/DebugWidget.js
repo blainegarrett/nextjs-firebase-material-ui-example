@@ -32,30 +32,59 @@ export default function DebugWidget() {
   let [tokenResult, setTokenResult] = useState([]);
   let [idToken, setIdToken] = useState();
 
+  function updateStuff() {
+    let user = firebase.auth().currentUser;
+
+    console.log('updating stuff...');
+
+    if (!user) {
+      setTokenResult(null);
+      setIdToken(null);
+    } else {
+      user
+        .getIdTokenResult()
+        .then(idTokenResult => {
+          // Confirm the user is an Admin.
+          setTokenResult(idTokenResult);
+          setIdToken(idTokenResult.token);
+          console.log({ idTokenResult });
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    }
+  }
+
   useEffect(
     () => {
-      let user = firebase.auth().currentUser;
+      let tokenStateUnsubscribe = firebase
+        .auth()
+        .onIdTokenChanged(function(user) {
+          if (user) {
+            authCtx.snackbarLog(
+              `onIdTokenChanged triggered with user ${user.uid}`,
+              'default'
+            );
+          } else {
+            authCtx.snackbarLog(
+              'onIdTokenChanged triggered without user',
+              'default'
+            );
+          }
+          updateStuff();
+        });
 
-      console.log({ idToken });
-
-      if (!user) {
-        setTokenResult(null);
-        setIdToken(null);
-      } else {
-        user
-          .getIdTokenResult()
-          .then(idTokenResult => {
-            // Confirm the user is an Admin.
-            setTokenResult(idTokenResult);
-            setIdToken(idTokenResult.token);
-            console.log({ idTokenResult });
-          })
-          .catch(error => {
-            console.log(error);
-          });
-      }
+      return tokenStateUnsubscribe;
     },
     [!!authCtx.user]
+  );
+
+  useEffect(
+    () => {
+      // Initial Call
+      updateStuff();
+    },
+    [!!authCtx.user, idToken]
   );
 
   return (

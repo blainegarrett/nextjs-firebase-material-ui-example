@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import MuiAppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -8,7 +9,7 @@ import Avatar from '@material-ui/core/Avatar';
 import { AuthContext } from '../auth/AuthContextProvider';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   root: {
     flexGrow: 1
   },
@@ -57,7 +58,7 @@ export default function AppBar({ signInRequired }) {
       <MuiAppBar position="static" color={color}>
         <Toolbar>
           <Typography variant="h6" className={classes.title}>
-            Example {color}
+            Firebase Auth Playground
           </Typography>
           {authJewel}
         </Toolbar>
@@ -65,3 +66,7 @@ export default function AppBar({ signInRequired }) {
     </div>
   );
 }
+
+AppBar.propTypes = {
+  signInRequired: PropTypes.bool
+};
